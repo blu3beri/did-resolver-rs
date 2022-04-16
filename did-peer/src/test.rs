@@ -1,5 +1,7 @@
 #[cfg(test)]
 mod tests {
+    use did::DidDocument;
+
     use crate::{DidPeer, NumAlgo};
 
     #[test]
@@ -33,7 +35,7 @@ mod tests {
     #[test]
     fn did_peer_get_numalgo_success() {
         let mock_did = "did:peer:1zQmZdT2jawCX5T1RKUB7ro83gQuiKbuHwuHi8G1NypB8BTr";
-        let numalgo = DidPeer::get_numalgo(mock_did).unwrap();
+        let numalgo = DidPeer::get_num_algo(mock_did).unwrap();
         assert!(numalgo == NumAlgo::GenesisDoc);
     }
 
@@ -41,6 +43,20 @@ mod tests {
     #[should_panic]
     fn did_peer_get_numalgo_fail() {
         let mock_did = "did:peer:8zQmZdT2jawCX5T1RKUB7ro83gQuiKbuHwuHi8G1NypB8BTr";
-        let _ = DidPeer::get_numalgo(mock_did);
+        let _ = DidPeer::get_num_algo(mock_did);
+    }
+
+    #[test]
+    fn did_peer_from_did_document_fail() {
+        let mock_did_document = DidDocument::default();
+        let did = DidPeer::from_did_document(mock_did_document, None);
+        assert!(did.is_err());
+    }
+
+    #[test]
+    fn did_peer_from_did_document_num_algo_genesis_doc() {
+        let mock_did_document = DidDocument::default();
+        let did = DidPeer::from_did_document(mock_did_document, Some(NumAlgo::GenesisDoc));
+        assert!(did.is_ok());
     }
 }

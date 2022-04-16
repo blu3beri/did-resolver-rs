@@ -1,4 +1,4 @@
-build: src
+build: 
 	cargo build --release
 
 lint:
