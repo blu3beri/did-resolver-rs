@@ -6,14 +6,14 @@ use serde_json::Value;
 
 #[derive(Default, Debug)]
 pub struct Did {
-    did: String,
-    did_url: String,
-    method: String,
-    id: String,
-    path: Option<String>,
-    fragment: Option<String>,
-    query: Option<String>,
-    params: BTreeMap<String, String>,
+    pub did: String,
+    pub did_url: String,
+    pub method: String,
+    pub id: String,
+    pub path: Option<String>,
+    pub fragment: Option<String>,
+    pub query: Option<String>,
+    pub params: BTreeMap<String, String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -111,10 +111,9 @@ pub fn parse_did(did: impl AsRef<str>) -> Result<Did> {
     let did_url = captured.get(0).ok_or(Error::UnableToParseDid)?;
     let did_method = captured.get(1).ok_or(Error::UnableToParseDid)?;
     let id = captured.get(2).ok_or(Error::UnableToParseDid)?;
-    let did = format!("did:{}:{}", did_method.as_str(), id.as_str());
 
     let did = Did {
-        did: did.as_str().to_owned(),
+        did: format!("did:{}:{}", did_method.as_str(), id.as_str()),
         id: id.as_str().to_owned(),
         method: did_method.as_str().to_owned(),
         did_url: did_url.as_str().to_owned(),

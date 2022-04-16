@@ -2,9 +2,28 @@ extern crate alloc;
 
 mod did;
 mod error;
+mod test;
 
 use did::{parse_did, Did, DidDocument};
-use error::Result;
+use error::{Error, Result};
+
+#[derive(Debug, Eq, PartialEq)]
+pub enum NumAlgo {
+    InceptionKeyWithoutDoc,
+    GenesisDoc,
+    MultipleInceptionKeyWithoutDoc,
+}
+
+impl NumAlgo {
+    fn from_u32(value: u32) -> Self {
+        match value {
+            0 => NumAlgo::InceptionKeyWithoutDoc,
+            1 => NumAlgo::GenesisDoc,
+            2 => NumAlgo::MultipleInceptionKeyWithoutDoc,
+            _ => panic!("Unknown value: {}", value),
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct DidPeer {
@@ -21,18 +40,31 @@ impl DidPeer {
             did_document,
         })
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use crate::DidPeer;
+    fn from_key(key: impl AsRef<str>) -> Result<Self> {
+        DidPeer::new(format!("did:peer:0{}", key.as_ref()), None)
+    }
 
-    #[test]
-    fn debug() {
-        let x = DidPeer::new(
-            "did:peer:1zQmZdT2jawCX5T1RKUB7ro83gQuiKbuHwuHi8G1NypB8BTr",
-            None,
-        );
-        println!("{:?}", x);
+    fn from_did(did: impl AsRef<str>) -> Result<Self> {
+        DidPeer::new(did, None)
+    }
+
+    fn from_did_document(did_document: DidDocument) -> Result<Self> {
+        todo!()
+    }
+
+    fn get_numalgo(did: impl AsRef<str>) -> Result<NumAlgo> {
+        let did = did.as_ref();
+        let mut parted = did.split(":");
+        let numalgo = parted
+            .nth(2)
+            .ok_or(Error::UnableToGetNumAlgo)?
+            .chars()
+            .nth(0)
+            .ok_or(Error::UnableToGetNumAlgo)?
+            .to_digit(10)
+            .ok_or(Error::UnableToGetNumAlgo)?;
+
+        return Ok(NumAlgo::from_u32(numalgo));
     }
 }
